@@ -24,6 +24,31 @@ struct mem {
 
 struct mem *shm;
 
+inr shopping()
+{
+	for ( int h = 0; h < CUSTOMERS;h++){
+ if(fork() == 0)
+  {
+   for (int j = 0; j < N_ROUNDS; j++) {
+    srand(time(NULL)+j);
+    a = rand() % N_GOODS;
+    b = rand() % 11;
+
+    pthread_mutex_lock(&shm->mut[a]);
+
+    shm->NRatings[a]++;
+    shm->Ratings[a] = ((((shm->NRatings[a])-1) * shm->Ratings[a] + b) /shm->NRatings[a]);
+
+    pthread_mutex_unlock(&shm->mut[a]);
+	}
+    exit(1);
+    }
+}
+	return 0;
+}
+
+
+
 int main(){
 static clock_t st_time;
 static clock_t en_time;
@@ -43,24 +68,7 @@ pthread_mutex_init(&shm->mut[i], (&shm->attr[i]));
 
 st_time = times(&st_cpu);
 
-for ( int h = 0; h < CUSTOMERS;h++){
- if(fork() == 0)
-  {
-   for (int j = 0; j < N_ROUNDS; j++) {
-    srand(time(NULL)+j);
-    a = rand() % N_GOODS;
-    b = rand() % 11;
-
-    pthread_mutex_lock(&shm->mut[a]);
-
-    shm->NRatings[a]++;
-    shm->Ratings[a] = ((((shm->NRatings[a])-1) * shm->Ratings[a] + b) /shm->NRatings[a]);
-
-    pthread_mutex_unlock(&shm->mut[a]);
-	}
-    exit(1);
-    }
-}
+shopping();
 	
 for ( int l =0;l<=CUSTOMERS;l++){wait(&status);}
 
