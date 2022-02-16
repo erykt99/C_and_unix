@@ -49,33 +49,6 @@ pthread_mutex_init(&shm->mut[i], (&shm->attr[i]));
 
 st_time = times(&st_cpu);
 
-shopping();
-
-en_time = times(&en_cpu);
-
-
-for (int i=0; i < N_GOODS; i++)
-{
- printf("%-2d. NRATINGS: %-3d Ratings: %-3f \n", i, shm->NRatings[i], shm->Ratings[i]);
- sum = sum + ((*shm).NRatings[i]);
-}
-printf("\nSuma: %lf \n",sum);
-for (int i=0; i<N_GOODS;i++){
-pthread_mutex_destroy(&shm->mut[i]);};
-shmdt(NULL);
-
-    printf("Real Time: %.2fs, User Time %.2fs, System Time %.2fs\n",
-        (float)(en_time - st_time)/100,
-        (float)(en_cpu.tms_cutime - st_cpu.tms_cutime)/100,
-        (float)(en_cpu.tms_cstime - st_cpu.tms_cstime)/100);
-
-
-}
-
-
-
-int shopping()
-{
     for ( int h = 0; h < CUSTOMERS;h++){
         if(fork() == 0)
          {
@@ -97,6 +70,27 @@ int shopping()
 	}
 
     for ( int l =0;l<=CUSTOMERS;l++){wait(&status);}
+
+en_time = times(&en_cpu);
+
+
+for (int i=0; i < N_GOODS; i++)
+{
+ printf("%-2d. NRATINGS: %-3d Ratings: %-3f \n", i, shm->NRatings[i], shm->Ratings[i]);
+ sum = sum + ((*shm).NRatings[i]);
+}
+printf("\nSuma: %lf \n",sum);
+for (int i=0; i<N_GOODS;i++){
+pthread_mutex_destroy(&shm->mut[i]);};
+shmdt(NULL);
+
+    printf("Real Time: %.2fs, User Time %.2fs, System Time %.2fs\n",
+        (float)(en_time - st_time)/100,
+        (float)(en_cpu.tms_cutime - st_cpu.tms_cutime)/100,
+        (float)(en_cpu.tms_cstime - st_cpu.tms_cstime)/100);
+
 	return 0;
 }
+
+
 
