@@ -24,7 +24,7 @@ struct mem {
 
 struct mem *shm;
 
-inr shopping()
+int shopping()
 {
 	for ( int h = 0; h < CUSTOMERS;h++){
  if(fork() == 0)
