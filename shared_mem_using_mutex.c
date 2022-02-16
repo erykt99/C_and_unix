@@ -25,21 +25,15 @@ struct mem {
 struct mem *shm;
 
 int main(){
-
-     	static clock_t st_time;
-    	static clock_t en_time;
-    	static struct tms st_cpu;
-    	static struct tms en_cpu;
+static clock_t st_time;
+static clock_t en_time;
+static struct tms st_cpu;
+static struct tms en_cpu;
 
 shmid = shmget (1245, sizeof( struct mem), IPC_CREAT | 0600 );
-
-
 shm = ((struct mem*) shmat(shmid, NULL, 0));
 
-
-
-for (int i = 0; i<N_GOODS; i++){
-shm->Ratings[i]=0; shm->NRatings[i]=0;};
+for (int i = 0; i<N_GOODS; i++){shm->Ratings[i]=0; shm->NRatings[i]=0;};
 
 for (int i = 0; i<N_GOODS; i++){
 pthread_mutexattr_init(&shm->attr[i]);
@@ -49,27 +43,26 @@ pthread_mutex_init(&shm->mut[i], (&shm->attr[i]));
 
 st_time = times(&st_cpu);
 
-    for ( int h = 0; h < CUSTOMERS;h++){
-        if(fork() == 0)
-         {
-            for (int j = 0; j < N_ROUNDS; j++) {
-            srand(time(NULL)+j);
-		   	a = rand() % N_GOODS;
-		    b = rand() % 11;
+for ( int h = 0; h < CUSTOMERS;h++){
+ if(fork() == 0)
+  {
+   for (int j = 0; j < N_ROUNDS; j++) {
+    srand(time(NULL)+j);
+    a = rand() % N_GOODS;
+    b = rand() % 11;
 
-            pthread_mutex_lock(&shm->mut[a]);
+    pthread_mutex_lock(&shm->mut[a]);
 
-           	shm->NRatings[a]++;
-	        shm->Ratings[a] = ((((shm->NRatings[a])-1) * shm->Ratings[a] + b) /shm->NRatings[a]);
+    shm->NRatings[a]++;
+    shm->Ratings[a] = ((((shm->NRatings[a])-1) * shm->Ratings[a] + b) /shm->NRatings[a]);
 
-            pthread_mutex_unlock(&shm->mut[a]);
-
-           }
-	exit(1);
-         }
+    pthread_mutex_unlock(&shm->mut[a]);
 	}
-
-    for ( int l =0;l<=CUSTOMERS;l++){wait(&status);}
+    exit(1);
+    }
+}
+	
+for ( int l =0;l<=CUSTOMERS;l++){wait(&status);}
 
 en_time = times(&en_cpu);
 
@@ -84,13 +77,9 @@ for (int i=0; i<N_GOODS;i++){
 pthread_mutex_destroy(&shm->mut[i]);};
 shmdt(NULL);
 
-    printf("Real Time: %.2fs, User Time %.2fs, System Time %.2fs\n",
-        (float)(en_time - st_time)/100,
+printf("Real Time: %.2fs, User Time %.2fs, System Time %.2fs\n",
+	(float)(en_time - st_time)/100,
         (float)(en_cpu.tms_cutime - st_cpu.tms_cutime)/100,
         (float)(en_cpu.tms_cstime - st_cpu.tms_cstime)/100);
-
-	return 0;
+return 0;
 }
-
-
-
